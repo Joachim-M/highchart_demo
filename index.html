@@ -1,0 +1,112 @@
+<!doctype>
+
+<script src="js/jquery-1.8.3.min.js"></script>
+<script src="js/highcharts.js"></script>
+<!--导出框需要加载的js-->
+<script src="js/exporting.js"></script>
+<!--主题-->
+<script src="js/grid-light.js"></script>
+<!--<script src="js/sand-signika.js"></script>-->
+
+<div id="chart_container">
+    <div id="container" style="min-width:200px;height:400px"></div>
+</div>
+
+<script>
+    (function () {
+
+        Highcharts.setOptions({
+            global: {
+                useUTC: false //关闭UTC  国内需要关闭
+            }
+        });
+        var option = {
+            chart: {
+                type: 'spline',
+                animation: Highcharts.svg, // don't animate in old IE
+                marginRight: 10, //右边空隙
+                zoomType: 'x', //x轴缩放
+                events: {
+                    load: function () {
+
+                        //动态加载数据
+                        var series = this.series;
+                        setInterval(function () {
+                            var x = (new Date()).getTime(), // current time
+                                    y = Math.random();
+                            for (var i = 0; i < series.length; i++) {
+                                series[i].addPoint([x, y + i], true, true);
+                            }
+                        }, 1000);
+                    }
+                }
+            },
+            credits: {
+                enabled: false  // 去除水印
+            },
+            title: {
+                text: '断点动态连续刷新'
+            },
+            xAxis: {
+                type: 'datetime', //x 时间轴
+            },
+            yAxis: {
+                title: {
+                    text: 'Value' //y轴副标题
+                },
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                            Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                            Highcharts.numberFormat(this.y, 2);
+                },
+                /* valueSuffix:'gb/s',*/  //全部信息
+            },
+            legend: {
+                enabled: false
+            },
+            exporting: {
+                enabled: true // false 关闭导出
+            },
+            series: [{
+                name: 'X1',
+                data: (function () {
+                    var data = [], time = (new Date()).getTime(), i;
+                    for (i = -19; i <= 0; i += 1) {
+                        data.push({
+                            x: time + i * 1000,  //时间为转换毫秒数
+                            y: Math.random()
+                        });
+                    }
+                    return data;
+                }())
+            }, {
+                name: 'X2',
+                data: (function () {
+                    var data = [], time = (new Date()).getTime(), i;
+                    for (i = -19; i <= 0; i += 1) {
+                        data.push({
+                            x: time + i * 1000,
+                            y: Math.random()
+                        });
+                    }
+                    return data;
+                }())
+            }],
+            plotOptions: {
+                spline: {
+                    lineWidth: 2,
+                    marker: {
+                        radius: 2,  //曲线点半径，默认是4
+                        symbol: 'circle' //曲线点类型："circle", "square", "diamond", "triangle","triangle-down"，默认是"circle"
+                    },
+                }
+            },
+        }
+
+        $('#container').highcharts(option);
+
+    })();
+
+</script>
